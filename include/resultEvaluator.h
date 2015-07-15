@@ -4,6 +4,9 @@
 #include <algorithm>
 #include <boost/filesystem/operations.hpp>
 #include <math.h>
+#include <boost/tuple/tuple.hpp>
+#include "gnuplot-iostream.h"
+
 
 namespace resultEvaluator{
 	class Evaluator{
@@ -30,14 +33,7 @@ namespace resultEvaluator{
             bool computeTable( std::vector<int> errThreshold,std::vector<std::vector<double> > finalResults);
 
             //! \brief save results to file
-            bool saveResults(std::string filePathDetection, std::string filePathRotation, std::string tableName);
-
-            //! \brief plot graphs
-            bool plotResults(std::string filePath,std::string graphName);
-
-            //! \brief save graphs
-            bool savePlots(std::string filePath,std::string graphName);
-
+            void saveResults(std::string filePathDetection, std::string filePathRotation, std::string tableName);
 
 		private:
             std::string m_resultsFolder;
@@ -45,7 +41,6 @@ namespace resultEvaluator{
             std::string m_objName;
             int m_FrameCount;
             std::vector<double> m_errorThreshold;
-
             std::vector< std::vector<double> > m_finalResults;
         };
 }

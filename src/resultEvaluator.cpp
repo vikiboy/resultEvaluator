@@ -259,7 +259,7 @@ namespace resultEvaluator{
         return true;
     }
 
-    bool Evaluator::saveResults(std::string filePathDetection,std::string filePathRotation, std::string tableName){
+    void Evaluator::saveResults(std::string filePathDetection,std::string filePathRotation, std::string tableName){
         std::ofstream resultsFile_detection;
         resultsFile_detection.open(filePathDetection.c_str(),std::ios::out);
         resultsFile_detection << "\t\t\t******"<<tableName<<"******\n"<<std::endl;
@@ -276,9 +276,8 @@ namespace resultEvaluator{
         for(int k=0;k<m_finalResults.size();k++){
             resultsFile_rotation<<m_finalResults[k][3]<<"\t\t"<<m_finalResults[k][4]<<"\t\t"<<m_finalResults[k][5]<<"\t\t"<<m_finalResults[k][6]<<"\n"<<std::endl;
         }
+        std::cout<<"Results saved successfully\n"<<std::endl;
     }
-
-
 }
 
 

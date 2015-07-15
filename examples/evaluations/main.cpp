@@ -11,6 +11,7 @@ int main(int argc,char* argv[])
     resultEvaluator::Evaluator evaluator(pathName,objName);
 
     std::string folderPath,pathToDetectionResults,pathToRotTransResults;
+    std::string pathToDetectionPlots;
     folderPath=pathName+"/"+objName+"-evaluationResults/";
     if(!boost::filesystem::exists(folderPath)){
         boost::filesystem::path dir(folderPath);
@@ -18,7 +19,9 @@ int main(int argc,char* argv[])
     }
     pathToDetectionResults=folderPath+"detectionResults.txt";
     pathToRotTransResults=folderPath+"RotTransResults.txt";
+    pathToDetectionPlots=folderPath+"DetectionPlots.png";
     evaluator.saveResults(pathToDetectionResults,pathToRotTransResults,objName);
+
     return 0;
 }
 
