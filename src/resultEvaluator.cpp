@@ -221,12 +221,6 @@ namespace resultEvaluator{
         }
 
         for(int k=0;k<errThreshold.size();k++){
-    //        std::cout<<"Error Threshold :"<<errThreshold[k]<<std::endl;
-    //        std::cout<<"Detection Percentage (Top 20) : "<<percentDetections_best[k]<<"\t\t";
-    //        std::cout<<"Detection Percentage (Highest Similarity Score): "<<percentDetections_zero[k]<<std::endl;
-    //        std::cout<<"Rotation Error in X : "<<mean_ErrRx[k]<<"\t\t Y : "<<mean_ErrRy[k]<<"\t\t Z : "<<mean_ErrRz[k]<<std::endl;
-    //        std::cout<<"Translation Error : "<<mean_ErrRT[k]<<std::endl;
-    //        std::cout<<"\n"<<std::endl;
             results.push_back(errThreshold[k]);
             results.push_back(percentDetections_zero[k]);
             results.push_back(percentDetections_best[k]);
