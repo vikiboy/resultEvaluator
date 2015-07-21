@@ -24,6 +24,9 @@ namespace resultEvaluator{
             //! \brief sort the contents according to L2 error score
             bool initsortResults(std::vector< std::vector<double> > toBeSortedResults, int numberOfMatches, std::vector<std::vector<double> > &finalResults);
 
+            //! \brief comupute table according to Rotation threshold using the sorted vector per frame
+            bool computeRotation(std::vector< std::vector<double> > finalResults, std::vector<double> errThreshold,std::vector< std::vector< double> > &rotResults);
+
             //! \brief check thresholds and compute results
             //! \brief give the %age of detections
             //! \brief give the mean rotation and translation errors
@@ -33,7 +36,7 @@ namespace resultEvaluator{
             bool computeTable( std::vector<int> errThreshold,std::vector<std::vector<double> > finalResults);
 
             //! \brief save results to file
-            void saveResults(std::string filePathDetection, std::string filePathRotation, std::string tableName);
+            void saveResults(std::string filePathDetection, std::string filePathRotation, std::string filePathRotErrors, std::string tableName);
 
 		private:
             std::string m_resultsFolder;
@@ -42,6 +45,8 @@ namespace resultEvaluator{
             int m_FrameCount;
             std::vector<double> m_errorThreshold;
             std::vector< std::vector<double> > m_finalResults;
+            std::vector< std::vector<double> > m_rotResults;
+            std::vector<double> m_meanTransError;
         };
 }
 		

@@ -76,6 +76,7 @@ namespace resultEvaluator{
         std::vector< std::vector<double> > DetectionResults;
         FinalResults.clear();
         int count_Matches=0,finalCount;
+        int rot_Matches = 0;
         if(results[0].size()!=0){
             for(int i=1;i<=m_FrameCount;i++){
                 for(int k=0;k<7;k++){
@@ -96,6 +97,15 @@ namespace resultEvaluator{
             }
             std::cout<<"Sorted results of all frames"<<std::endl;
             std::cout<<"\n"<<std::endl;
+
+            //! degrees
+            static const double rotError[] = {5,10,15,20,25};
+            std::vector<double> rotThreshold (rotError, rotError + sizeof(rotError) / sizeof(rotError[0]) );
+            std::vector< std::vector< double> > rotResults;
+            if(this->computeRotation(FinalResults,rotThreshold,rotResults)){
+                std::cout<<"Table according to rotation thresholds built"<<std::endl;
+            }
+
             if(this->checkResults(FinalResults,DetectionResults)){
             }
             return true;
@@ -147,6 +157,55 @@ namespace resultEvaluator{
         finalResults.push_back(sortErrRy);                  //4,11,18,...7k+4
         finalResults.push_back(sortErrRz);                  //5,12,19,...7k+5
         finalResults.push_back(sortErrRT);                  //6,13,20,...7k+6
+        return true;
+    }
+
+    bool Evaluator::computeRotation(std::vector<std::vector<double> > finalResults, std::vector<double> errThreshold, std::vector<std::vector<double> > &rotResults){
+
+        int flags_rot[]={0,0,0,0,0},count_DetectionsRot[]={0,0,0,0,0};
+        std::vector<double> tempRot;
+        double Trans[]={0,0,0,0,0};
+        double meanTrans[]={0,0,0,0,0};
+
+        std::vector<double> meanTransError;
+        for(int i=0;i<m_FrameCount;i++){
+            for(int j=0;j<finalResults[7*i].size();j++){
+                for(int k=0;k<errThreshold.size();k++){
+                if((((finalResults[7*i+3][j])*RAD2DEG)<=errThreshold[k])&&(((finalResults[7*i+4][j])*RAD2DEG)<=errThreshold[k])&&(((finalResults[7*i+5][j])*RAD2DEG)<=errThreshold[k])){
+                    flags_rot[k]++;
+                    Trans[k]+=finalResults[7*i+2][j];
+                    }
+                }
+            }
+            for(int k=0;k<errThreshold.size();k++){
+                if(flags_rot[k]>0){
+                    count_DetectionsRot[k]++;
+                    Trans[k]/=flags_rot[k];
+                    meanTrans[k]+=Trans[k];
+                }
+                flags_rot[k]=0;
+                Trans[k]=0;
+            }
+        }
+
+        for(int k=0;k<errThreshold.size();k++){
+            tempRot.push_back(errThreshold[k]);
+            tempRot.push_back((count_DetectionsRot[k]*100)/(float)m_FrameCount);
+            rotResults.push_back(tempRot);
+            meanTransError.push_back(meanTrans[k]/count_DetectionsRot[k]);
+            tempRot.clear();
+        }
+
+
+        for(int k=0;k<errThreshold.size();k++){
+            std::cout<<"Rotation Error : "<<rotResults[k][0]<<"\t\t % of Detections : "<<rotResults[k][1];
+            std::cout<<"\t\t Translation Error : "<<meanTransError[k]<<std::endl;
+        }
+        std::cout<<"\n"<<std::endl;
+
+        m_rotResults=rotResults;
+        m_meanTransError=meanTransError;
+
         return true;
     }
 
@@ -253,7 +312,7 @@ namespace resultEvaluator{
         return true;
     }
 
-    void Evaluator::saveResults(std::string filePathDetection,std::string filePathRotation, std::string tableName){
+    void Evaluator::saveResults(std::string filePathDetection,std::string filePathRotation, std::string filePathRotErrors, std::string tableName){
         std::ofstream resultsFile_detection;
         resultsFile_detection.open(filePathDetection.c_str(),std::ios::out);
         resultsFile_detection << "\t\t\t******"<<tableName<<"******\n"<<std::endl;
@@ -270,7 +329,17 @@ namespace resultEvaluator{
         for(int k=0;k<m_finalResults.size();k++){
             resultsFile_rotation<<m_finalResults[k][3]<<"\t\t"<<m_finalResults[k][4]<<"\t\t"<<m_finalResults[k][5]<<"\t\t"<<m_finalResults[k][6]<<"\n"<<std::endl;
         }
+
+        std::ofstream resultsFile_rotError;
+        resultsFile_rotError.open(filePathRotErrors.c_str(),std::ios::out);
+        resultsFile_rotError << "\t\t\t******"<<tableName<<"******\n"<<std::endl;
+        resultsFile_rotError<<"\t\tRotation Error"<<"\t\t"<<"\n"<<std::endl;
+        for(int k=0;k<m_rotResults.size();k++){
+            resultsFile_rotError<<"Rotation Error : "<<m_rotResults[k][0]<<"\t\t % of Detections : "<<m_rotResults[k][1];
+            resultsFile_rotError<<"\t\t Translation Error : "<<m_meanTransError[k]<<std::endl;
+        }
         std::cout<<"Results saved successfully\n"<<std::endl;
+
     }
 }
 
